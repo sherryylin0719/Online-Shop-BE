@@ -1,19 +1,9 @@
+const db = require('../../config/mongoose')
 const fetchData = require('./apiService')
 const Product = require('../product')
-const mongoose = require('mongoose')
 const Order = require('../order')
 const User = require('../user')
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
-}
-// mongodb connection
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-const db = mongoose.connection
-
-db.on('error', () => {
-  console.log('mongodb error!')
-})
 db.once('open', async () => {
   try {
     console.log('mongodb connected!')
