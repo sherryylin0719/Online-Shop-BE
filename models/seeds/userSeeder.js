@@ -6,15 +6,19 @@ const User = require('../user')
 db.once('open', async () => {
   try {
     console.log('mongodb connected!')
+    // create admin data
+    const rootSalt = await bcrypt.genSalt(10)
+    const rootHash = await bcrypt.hash('12345678', rootSalt)
+    const rootUser = {
+      name: 'root',
+      email: 'root@example.com',
+      password: rootHash,
+      role: 'admin',
+    }
     // axios get data
     const userData = await fetchData('users?limit=5')
     // create user data
-    let newUsers = [{
-      name: 'root',
-      email: 'root@example.com',
-      password: '12345678',
-      role: 'admin',
-    }]
+    let newUsers = [rootUser]
     for (let i = 0; i < userData.length; i++) {
       const salt = await bcrypt.genSalt(10)
       const hash = await bcrypt.hash(userData[i].password, salt)
