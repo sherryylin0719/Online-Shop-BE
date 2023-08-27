@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const passportJWT = require('passport-jwt')
@@ -37,8 +40,10 @@ passport.use(new JWTStrategy({
   secretOrKey: process.env.JWT_SECRET
 }, async (jwtPayload, cb) => {
   try {
-    const user = await User.findByPk(jwtPayload.id)
-    if (!user) return cb(null, false)
+    const user = await User.findOne({ _id: jwtPayload._id });
+    if (!user) {
+      return cb(null, false)
+    }
     return cb(null, user)
   } catch (err) {
     return cb(err)

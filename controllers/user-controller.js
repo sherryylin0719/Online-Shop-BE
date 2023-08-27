@@ -12,7 +12,7 @@ const userController = {
         status: 'success',
         data: {
           token,
-          user: userData
+          user: userData,
         }
       })
     } catch (err) {
@@ -76,6 +76,25 @@ const userController = {
       next(err)
     }
   },
+  getUser: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user._id)
+      if (!user) return res.status(400).json({ msg: "User does not exist." })
+      
+      const userData = user.toJSON()
+      delete userData.password;
+
+      res.status(200).json({
+        status: 'success',
+        data: {
+          user: userData
+        }
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
+
 }
 
 module.exports = userController
