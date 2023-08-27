@@ -1,6 +1,7 @@
 const { isValidPassword, isValidEmail } = require ('../helpers/validation-helpers.js')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
+const bycrypt = require('bcryptjs')
 
 const userController = {
   logIn: async (req, res, next) => {
@@ -93,8 +94,50 @@ const userController = {
     } catch (err) {
       next(err)
     }
+  },
+  editUser: async (req, res, next) => {
+    try {
+      // find user
+      const user = await User.findById(req.user._id)
+      if (!user) return res.status(400).json({ msg: "User does not exist." })
+
+      // request body
+      const { name, email, password, passwordCheck, birthday, gender, address, phone } = req.body
+
+      // check if email already exists
+      if(email){
+        const checkEmail = await User.findOne({ email })
+        if (checkEmail && checkEmail._id.toString() !== user._id.toString()) {
+          return res.status(400).json({ msg: "An account with this email already exists." })
+        }
+        if(!isValidEmail(email)) {
+        return res.status(400).json({ msg: "Invalid email address." })
+        }
+      }
+
+      // validation
+      if(password !== passwordCheck) {
+        return res.status(400).json({ msg: "Enter the same password twice for verification." })
+      }
+
+      // update user
+      if (name) user.name = name;
+      if (email) user.email = email;
+      if (birthday) user.birthday = birthday;
+      if (gender) user.gender = gender;
+      if (address) user.address = address;
+      if (phone) user.phone = phone;
+
+      await user.save()
+
+      res.status(200).json({
+        status: 'success',
+        message: 'edit user success'
+      })
+
+    } catch (err) {
+      next(err)
+    }
   }
-
 }
-
 module.exports = userController
