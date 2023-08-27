@@ -35,11 +35,11 @@ const userSchema = new Schema({
     required: false
   },
   orders: [{
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Order'
   }],
   cart: { 
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Cart'
   },
   role: {

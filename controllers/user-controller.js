@@ -2,6 +2,7 @@ const { isValidPassword, isValidEmail } = require ('../helpers/validation-helper
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const bycrypt = require('bcryptjs')
+const Order = require('../models/order')
 
 const userController = {
   logIn: async (req, res, next) => {
@@ -135,6 +136,22 @@ const userController = {
         message: 'edit user success'
       })
 
+    } catch (err) {
+      next(err)
+    }
+  },
+  getUserOrders: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user._id)
+      if (!user) return res.status(400).json({ msg: "User does not exist." })
+
+      const orders = await user.populate('orders').execPopulate()
+      res.status(200).json({
+        status: 'success',
+        data: {
+          orders: orders.orders
+        }
+      })
     } catch (err) {
       next(err)
     }
