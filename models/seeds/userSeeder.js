@@ -2,6 +2,7 @@ const db = require('../../config/mongoose')
 const fetchData = require('./apiService')
 const bcrypt = require("bcryptjs")
 const User = require('../user')
+const Order = require('../order')
 
 db.once('open', async () => {
   try {
@@ -35,6 +36,15 @@ db.once('open', async () => {
 
     // insert data
     await User.create(newUsers);
+
+    // add order data into users
+    // const orderList = await Order.find().lean();
+    // for (let i = 0; i < orderList.length; i++) {
+    //   const orderId = orderList[i]._id;
+    //   const userId = orderList[i].userId;
+      
+    //   await User.findByIdAndUpdate(userId, { $addToSet: { orders: orderId } });
+    // }
 
     console.log('done')
     process.exit()

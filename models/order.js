@@ -3,7 +3,8 @@ const Schema = mongoose.Schema
 
 const productSchema = new Schema({
   productId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
     required: true
   },
   quantity: {
@@ -14,7 +15,8 @@ const productSchema = new Schema({
 
 const orderSchema = new Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   date: {

@@ -34,6 +34,14 @@ const userSchema = new Schema({
     type: String,
     required: false
   },
+  orders: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Order'
+  }],
+  cart: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Cart'
+  },
   role: {
     type: String,
     default: 'user'
