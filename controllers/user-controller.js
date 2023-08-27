@@ -1,7 +1,6 @@
 const { isValidPassword, isValidEmail } = require ('../helpers/validation-helpers.js')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const bycrypt = require('bcryptjs')
 const Order = require('../models/order')
 
 const userController = {
