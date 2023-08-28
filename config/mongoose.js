@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== 'production') {
 const dbUrl = process.env.NODE_ENV === 'production' ? process.env.MONGODB_URI : process.env.MONGODB_LOCALURI;
 
 // mongodb connection
-mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true }, { useFindAndModify: false })
 
 const db = mongoose.connection
 db.on('error', () => {

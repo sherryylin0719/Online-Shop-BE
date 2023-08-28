@@ -19,11 +19,38 @@ const orderSchema = new Schema({
     ref: 'User',
     required: true
   },
+  products: [productSchema],
+  totalAmount: {
+    type: Number,
+    required: true
+  },
+  shippingAddress: {
+    type: String,
+    required: true
+  },
+  paymentMethod: {
+    type: String,
+    required: true,
+    default: 'COD'
+  },
+  isPaid: {
+    type: Boolean,
+    default: false
+  },
+  paidAt: {
+    type: Date
+  },
+  isDelivered: {
+    type: Boolean,
+    default: false
+  },
+  deliveredAt: {
+    type: Date
+  },
   date: {
     type: Date,
     default: new Date()
   },
-  products: [productSchema],
   createdAt: {
     type: Date,
     default: Date.now

@@ -154,6 +154,35 @@ const userController = {
     } catch (err) {
       next(err)
     }
+  },
+  createOrder: async (req, res, next) => {
+    try {
+      // create order in order collection
+      const { products, totalAmount, shippingAddress, paymentMethod } = req.body
+      const userId = req.user._id
+      const order = await Order.create({
+        products,
+        totalAmount,
+        shippingAddress,
+        paymentMethod,
+        userId
+      })
+
+      // add order to user order array
+      const orderId = order._id
+      await User.findByIdAndUpdate(userId, { $push: { orders: orderId } })
+
+      res.status(201).json({
+        status: 'success',
+        message: 'create order success',
+        data: {
+          order
+        }
+      })
+      
+    } catch (err) {
+      next(err)
+    } 
   }
 }
 module.exports = userController

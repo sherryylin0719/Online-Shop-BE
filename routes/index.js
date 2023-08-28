@@ -12,9 +12,10 @@ const cartRouter = require('./modules/cart')
 router.use('/products', productRouter)
 router.use('/cart', authenticated, cartRouter)
 router.use('/user', authenticated, userRouter)
+router.post('/order', authenticated, userController.createOrder)
 router.post('/register', userController.signUp)
-router.post('/login', passport.authenticate('local', { session: false }), userController.logIn)
 router.post('/logout', authenticated, userController.logOut)
+router.post('/login', passport.authenticate('local', { session: false }), userController.logIn)
 
 
 module.exports = router
