@@ -29,6 +29,11 @@ const productSchema = new Schema({
     type: String,
     required: false
   },
+  quantity: {
+    type: Number,
+    required: true,
+    default: 0
+  },
   image: [ImageSchema],
   createdAt: {
     type: Date,

@@ -1,26 +1,10 @@
 const Product = require('../models/product.js')
+const productHelper = require('../helpers/product-helper');
 
 const productController = {
   getProducts: async (req, res, next) => {
     try {
-      const productLists = await Product.find()
-      if (productLists.length === 0) {
-        res.status(200).json({
-          status: 'success',
-          message: 'Get products success',
-          data: {
-            products: []
-          }
-        });
-      } else {
-        res.status(200).json({
-          status: 'success',
-          message: 'Get products success',
-          data: {
-            products: productLists
-          }
-        });
-      }
+      productHelper.getProducts(req, res, next);
     } catch (err) {
       next(err)
     }
