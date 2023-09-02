@@ -133,10 +133,14 @@ const userController = {
       if (phone) user.phone = phone;
 
       await user.save()
+      delete user.password
 
       res.status(200).json({
         status: 'success',
-        message: 'edit user success'
+        message: 'edit user success',
+        data: {
+          user
+        }
       })
 
     } catch (err) {
