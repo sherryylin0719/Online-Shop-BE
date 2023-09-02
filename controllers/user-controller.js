@@ -1,7 +1,8 @@
 const { isValidPassword, isValidEmail } = require ('../helpers/validation-helpers.js')
+const hashedPassword = require('../helpers/general-helper.js').hashedPassword
+const Order = require('../models/order')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const Order = require('../models/order')
 
 const userController = {
   logIn: async (req, res, next) => {
@@ -58,11 +59,14 @@ const userController = {
         return res.status(400).json({ msg: "An account with this email already exists." })
       }
 
+      // hash password
+      const hash = await hashedPassword(password)
+
       // create new user
       await User.create({ 
         name,
         email,
-        password,
+        password: hash,
         birthday: birthday || null,
         gender: gender || null,
         address: address || null,

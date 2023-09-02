@@ -1,4 +1,6 @@
-function generateRandomString(length) {
+const bcrypt = require("bcryptjs")
+
+const generateRandomString = length => {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -10,6 +12,17 @@ function generateRandomString(length) {
     return result;
 }
 
+const hashedPassword = async (password) => {
+  try {
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+    return hashedPassword
+  } catch (err) {
+    next(err)
+  }
+}
+
 module.exports = {
-  generateRandomString
+  generateRandomString,
+  hashedPassword
 }
