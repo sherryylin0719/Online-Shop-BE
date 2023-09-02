@@ -39,7 +39,7 @@ db.once('open', async () => {
     // await Product.create(newProducts)
 
     // add quantity into product
-    // await Product.updateMany({}, { $set: { quantity: 0 } })
+    await Product.updateMany({}, { $set: { quantity: 10 } })
 
     // upload product image to cloudinary and add publicId into product
     // const products = await Product.find().lean()
