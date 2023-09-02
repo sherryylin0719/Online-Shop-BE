@@ -1,6 +1,7 @@
 const { uploadImage, updateImage, deleteImage } = require('../helpers/file-helper');
 const productHelper = require('../helpers/product-helper');
 const Product = require('../models/product');
+const Order = require('../models/order');
 const User = require('../models/user');
 
 const adminController = {
@@ -130,6 +131,55 @@ const adminController = {
       next(err)
     }
   },
+  getOrders: async (req, res, next) => {
+    try {
+      const orders = await Order.find().populate({  
+        path: 'products',
+        populate: {
+          path: 'productId'
+        }
+      }).populate({ path: 'userId', select: '-password', select: '-cart' })
+
+      const response = {
+        status: 'success',
+        message: 'Get orders success',
+        data: {
+          orders: orders
+        }
+      };
+      if (orders.length === 0) {
+        response.data.orders = []; 
+      }
+      res.status(200).json(response);
+
+    } catch (err) {
+      next(err)
+    }
+  },
+  deleteOrder: async (req, res, next) => {
+    try {
+      const orderId = req.params.id
+      const order = await Order.find({ _id: orderId }).populate({
+        path: 'userId',
+        select: '-password',
+      })
+      const userId = order[0].userId._id
+      console.log(userId)
+      // delete order from user
+      await Order.findByIdAndDelete(orderId)
+      // delete order from user
+      await User.updateOne({ _id: userId }, { $pull: { orders: orderId } });
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Delete order success',
+      });
+      
+    } catch (err) {
+      next(err)
+    }
+  },
+
 }
 
 module.exports = adminController;
