@@ -9,6 +9,10 @@ const ImageSchema = new Schema({
   metadata: {
     type: String,
     required: false
+  },
+  publicId: {
+    type: String,
+    required: false
   }
 })
 

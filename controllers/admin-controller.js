@@ -1,4 +1,5 @@
 const uploadImage = require('../helpers/file-helper').uploadImage
+const updateImage = require('../helpers/file-helper').updateImage
 const productHelper = require('../helpers/product-helper');
 const Product = require('../models/product');
 
@@ -39,7 +40,37 @@ const adminController = {
   },
   editProduct: async (req, res, next) => {
     try {
-      // upload image to cloudinary
+      const { title, price, category, description, quantity } = req.body
+      // get product id
+      const productId = req.params.id
+
+      // check if required fields are not empty
+      if (!title || !price || !category || !quantity) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'Please fill all required fields'
+        })
+      }
+      // update image on cloudinary and return image object
+      const image = await updateImage(req, res, next)
+
+      // update product
+      const product = await Product.findByIdAndUpdate(productId, {
+        title,
+        price,
+        category,
+        description,
+        quantity,
+        image
+      }, { new: true })
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Edit product success',
+        data: {
+          product: product
+        }
+      });
 
     } catch (err) {
       next(err)

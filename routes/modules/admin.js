@@ -5,6 +5,7 @@ const adminController = require('../../controllers/admin-controller')
 
 
 
+router.put('/products/:id', multerUpload, adminController.editProduct)
 router.get('/products', adminController.getProducts)
 router.post('/products', multerUpload, adminController.addNewProduct)
 

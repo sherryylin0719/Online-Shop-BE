@@ -1,6 +1,7 @@
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
+const Product = require('../models/product');
 
 // set up multer
 const multer = require('multer')
@@ -21,28 +22,70 @@ cloudinary.config({
   secure: true
 });
 
+// upload image to cloudinary and return image object
 const uploadImage = async (req, res, next) => {
   try {
-    // upload image to cloudinary
-    const imageUrls = [];
+    // upload image to cloudinary and create image object
+    const image = [];
     for (let i = 0; i < req.files.length; i++) {
       const file = dataUri(req.files[i]).content;
       const result = await cloudinary.uploader.upload(file, {
-      public_id: "products",
+      public_id: `products/${req.files[i].originalname.toString()}`,
       resource_type: "auto",
       secure: true,
       });
-      imageUrls.push(result.secure_url);
+      image.push({ url: result.secure_url, metadata: req.body.title, publicId: result.public_id });
     }
+    return image
+
+  } catch (err) {
+    next(err)
+  }
+}
+
+// update image on cloudinary and return image object
+const updateImage = async (req, res, next) => {
+  try {
     // create image object
     const image = []
-    for (let i = 0; i < imageUrls.length; i++) {
-      image.push({
-        url: imageUrls[i],
-        metadata: title
-      })
-      return image
+    // get product id
+    const productId = req.params.id
+    // get product image list
+    const currentImageList = (await Product.findById(productId).select('image')).image;
+    // get new image list
+    const newImageList = req.files.map(file => file.originalname.toString());
+
+    // filter out same image from new image list
+    const sameImageList = newImageList.filter(url => currentImageList.some(img => img.url === url))
+    // filter out to be deleted image from current image list
+    const deleteImageList = currentImageList.filter(img => !newImageList.includes(img.url))
+    // filter out to be uploaded image from new image list
+    const uploadImageList = newImageList.filter(url => !currentImageList.some(img => img.url === url))
+
+    // push same image to image object
+    for (let i = 0; i < sameImageList.length; i++) {
+      image.push(sameImageList[i])
     }
+
+    // if image has publicId, delete image on cloudinary
+    for (let i = 0; i < deleteImageList.length; i++) {
+      if (deleteImageList[i].publicId !== '') {
+        await cloudinary.uploader.destroy(deleteImageList[i].publicId)
+      } 
+    }
+
+    // upload image to cloudinary
+    for (let i = 0; i < uploadImageList.length; i++) {
+      const file = dataUri(req.files[i]).content;
+      const result = await cloudinary.uploader.upload(file, {
+      public_id: `products/${req.files[i].originalname.toString()}`,
+      resource_type: "auto",
+      secure: true,
+      });
+      image.push({ url: result.secure_url, metadata: req.body.title, publicId: result.public_id });
+    }
+    return image
+
   } catch (err) {
     next(err)
   }
@@ -51,6 +94,7 @@ const uploadImage = async (req, res, next) => {
 module.exports = {
   multerUpload,
   dataUri,
-  uploadImage
+  uploadImage,
+  updateImage
 };
   
