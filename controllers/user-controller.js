@@ -133,13 +133,14 @@ const userController = {
       if (phone) user.phone = phone;
 
       await user.save()
-      delete user.password
+      const userData = user.toObject()
+      delete userData.password;
 
       res.status(200).json({
         status: 'success',
         message: 'edit user success',
         data: {
-          user
+          user: userData
         }
       })
 
