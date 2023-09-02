@@ -1,6 +1,7 @@
 const { uploadImage, updateImage, deleteImage } = require('../helpers/file-helper');
 const productHelper = require('../helpers/product-helper');
 const Product = require('../models/product');
+const User = require('../models/user');
 
 const adminController = {
   getProducts: async (req, res, next) => {
@@ -93,7 +94,42 @@ const adminController = {
     } catch (err) {
       next(err)
     }
-  }
+  },
+  getUsers: async (req, res, next) => {
+    try {
+      const users = await User.find({ role: 'user' }).populate({
+        path: 'orders',
+      }).select('-password');
+      const response = {
+        status: 'success',
+        message: 'Get users success',
+        data: {
+          users: users
+        }
+      };
+      if (users.length === 0) {
+        response.data.users = []; 
+      }
+      res.status(200).json(response);
+
+    } catch (err) {
+      next(err)
+    }
+  },
+  deleteUser: async (req, res, next) => {
+    try {
+      const userId = req.params.id
+      // delete user
+      await User.findByIdAndDelete(userId)
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Delete user success',
+      });
+    } catch (err) {
+      next(err)
+    }
+  },
 }
 
 module.exports = adminController;
