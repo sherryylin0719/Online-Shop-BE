@@ -1,5 +1,4 @@
-const uploadImage = require('../helpers/file-helper').uploadImage
-const updateImage = require('../helpers/file-helper').updateImage
+const { uploadImage, updateImage, deleteImage } = require('../helpers/file-helper');
 const productHelper = require('../helpers/product-helper');
 const Product = require('../models/product');
 
@@ -76,6 +75,25 @@ const adminController = {
       next(err)
     }
   },
+  deleteProduct: async (req, res, next) => {
+    try {
+      const productId = req.params.id
+      // delete image on cloudinary
+      await deleteImage(req, res, next)
+      // delete product
+      const product = await Product.findByIdAndDelete(productId)
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Delete product success',
+        data: {
+          product: product
+        }
+      });
+    } catch (err) {
+      next(err)
+    }
+  }
 }
 
 module.exports = adminController;

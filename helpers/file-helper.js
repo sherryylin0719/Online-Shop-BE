@@ -1,6 +1,7 @@
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
+const generateRandomString = require('../helpers/general-helper').generateRandomString
 const Product = require('../models/product');
 
 // set up multer
@@ -28,9 +29,10 @@ const uploadImage = async (req, res, next) => {
     // upload image to cloudinary and create image object
     const image = [];
     for (let i = 0; i < req.files.length; i++) {
+      const randomString = generateRandomString(10)
       const file = dataUri(req.files[i]).content;
       const result = await cloudinary.uploader.upload(file, {
-      public_id: `products/${req.files[i].originalname.toString()}`,
+      public_id: `products/${req.body.title}-${randomString}`,
       resource_type: "auto",
       secure: true,
       });
@@ -76,9 +78,10 @@ const updateImage = async (req, res, next) => {
 
     // upload image to cloudinary
     for (let i = 0; i < uploadImageList.length; i++) {
+      const randomString = generateRandomString(10)
       const file = dataUri(req.files[i]).content;
       const result = await cloudinary.uploader.upload(file, {
-      public_id: `products/${req.files[i].originalname.toString()}`,
+      public_id: `products/${req.body.title}-${randomString}`,
       resource_type: "auto",
       secure: true,
       });
@@ -91,10 +94,27 @@ const updateImage = async (req, res, next) => {
   }
 }
 
+// delete image on cloudinary
+const deleteImage = async (req, res, next) => {
+  try {
+    // get product id
+    const productId = req.params.id
+    // get product image list
+    const currentImageList = (await Product.findById(productId).select('image')).image;
+    // delete image on cloudinary
+    for (let i = 0; i < currentImageList.length; i++) {
+      await cloudinary.uploader.destroy(currentImageList[i].publicId)
+    }
+  } catch (err) {
+    next(err)
+  }
+}
+
 module.exports = {
   multerUpload,
   dataUri,
   uploadImage,
-  updateImage
+  updateImage,
+  deleteImage
 };
   
