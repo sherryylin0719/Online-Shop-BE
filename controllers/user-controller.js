@@ -1,5 +1,6 @@
 const { isValidPassword, isValidEmail } = require ('../helpers/validation-helpers.js')
 const hashedPassword = require('../helpers/general-helper.js').hashedPassword
+const Product = require('../models/product')
 const Order = require('../models/order')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
@@ -168,6 +169,12 @@ const userController = {
     try {
       // create order in order collection
       const { products, totalAmount, shippingAddress, paymentMethod } = req.body
+      
+      // check if all fields are filled
+      if(!products || !totalAmount || !shippingAddress || !paymentMethod) {
+        return res.status(400).json({ msg: "Not all fields have been entered." })
+      }
+
       const userId = req.user._id
       const order = await Order.create({
         products,
@@ -176,10 +183,17 @@ const userController = {
         paymentMethod,
         userId
       })
-
+    
       // add order to user order array
       const orderId = order._id
       await User.findByIdAndUpdate(userId, { $push: { orders: orderId } })
+      
+      // update product quantity
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i]
+        const productInDB = await Product.findById(product.productId)
+        await Product.updateOne({ _id: product.productId }, { quantity: productInDB.quantity - product.quantity })
+      }
 
       res.status(201).json({
         status: 'success',
