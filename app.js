@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 const express = require('express')
+const session = require('express-session')
 const passport = require('./config/passport')
 const bodyParser = require("body-parser")
 const apiRouter = require('./routes')
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 3000
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(passport.initialize())
 app.use(express.json())
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }))
 
 app.get('/', (req, res) => {
   res.send('hello world')

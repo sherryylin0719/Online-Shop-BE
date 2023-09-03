@@ -24,7 +24,9 @@ const userController = {
   },
   logOut: async (req, res, next) => { 
     try {
-      req.logout()
+      req.logout(err => {
+        if (err) throw err
+      })
       res.json({
         status: 'success',
         message: 'logout success'
