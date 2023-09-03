@@ -105,9 +105,8 @@ const deleteImage = async (req, res, next) => {
     for (let i = 0; i < currentImageList.length; i++) {
       await cloudinary.uploader.destroy(currentImageList[i].publicId)
     }
-    
+
   } catch (err) {
-    console.log(err)
     next(err)
   }
 }
