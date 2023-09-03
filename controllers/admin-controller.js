@@ -81,17 +81,25 @@ const adminController = {
     try {
       const productId = req.params.id
       // delete image on cloudinary
-      await deleteImage(req, res, next)
+      const imageDeleted = await deleteImage(req, res, next)
       // delete product
       const product = await Product.findByIdAndDelete(productId)
-
-      res.status(200).json({
-        status: 'success',
-        message: 'Delete product success',
-        data: {
-          product: product
-        }
-      });
+      
+      if (imageDeleted && product) {
+        res.status(200).json({
+          status: 'success',
+          message: 'Delete product success',
+          data: {
+            product: product
+          }
+        });
+      } else {
+        res.status(500).json({
+          status: 'fail',
+          message: 'Delete product failed'
+        });
+      }
+      
     } catch (err) {
       next(err)
     }
