@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 const db = require('../../config/mongoose')
 const fetchData = require('./apiService')
 const bcrypt = require("bcryptjs")
@@ -8,8 +11,8 @@ db.once('open', async () => {
   try {
     console.log('mongodb connected!')
     // create admin data
-    // const rootSalt = await bcrypt.genSalt(10)
-    // const rootHash = await bcrypt.hash('12345678', rootSalt)
+    const rootSalt = await bcrypt.genSalt(10)
+    const rootHash = await bcrypt.hash(process.env.ADMIN_PASSWORD , rootSalt)
     // const rootUser = {
     //   name: 'root',
     //   email: 'root@example.com',
@@ -38,13 +41,16 @@ db.once('open', async () => {
     // await User.create(newUsers);
 
     // add order data into users
-    const orderList = await Order.find().lean();
-    for (let i = 0; i < orderList.length; i++) {
-      const orderId = orderList[i]._id;
-      const userId = orderList[i].userId;
+    // const orderList = await Order.find().lean();
+    // for (let i = 0; i < orderList.length; i++) {
+    //   const orderId = orderList[i]._id;
+    //   const userId = orderList[i].userId;
       
-      await User.findByIdAndUpdate(userId, { $addToSet: { orders: orderId } });
-    }
+    //   await User.findByIdAndUpdate(userId, { $addToSet: { orders: orderId } });
+    // }
+
+    // change admin password
+    await User.findOneAndUpdate({ email: 'root@example.com' }, { password: rootHash })
 
     console.log('done')
     process.exit()
