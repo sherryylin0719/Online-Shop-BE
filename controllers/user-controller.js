@@ -66,7 +66,7 @@ const userController = {
       const hash = await hashedPassword(password)
 
       // create new user
-      await User.create({ 
+      const newUser = await User.create({ 
         name,
         email,
         password: hash,
@@ -75,10 +75,14 @@ const userController = {
         address: address || null,
         phone: phone || null
       })
+      const newUserData = newUser.toJSON()
+      delete newUserData.password
+      const token = jwt.sign(newUserData, process.env.JWT_SECRET, { expiresIn: '30d' })
       
       res.status(201).json({
         status: 'success',
-        message: 'sign up success'
+        user: newUserData,
+        token
       })
     } catch (err) { 
       next(err)
